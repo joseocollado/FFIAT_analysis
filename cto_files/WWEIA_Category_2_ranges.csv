@@ -1,0 +1,77 @@
+﻿Category_1,Category_2,C2_min,C2_max
+Milk and Dairy,Milk,1000,1009
+Milk and Dairy,Flavored Milk,1200,1210
+Milk and Dairy,Dairy Drinks,1402,1402
+Milk and Dairy,Cheese,1600,1610
+Milk and Dairy,Yogurt,1820,1830
+Milk and Dairy,Plant-based Dairy,1900,1910
+Protein Foods,Meats,2000,2020
+Protein Foods,Poultry,2200,2210
+Protein Foods,Seafood,2400,2410
+Protein Foods,Eggs,2502,2502
+Protein Foods,Cured meats/Poultry,2600,2610
+Protein Foods,Plant-based Protein Foods,2800,2810
+Mixed Dishes,"Meat, Poultry, Seafood",3000,3010
+Mixed Dishes,Bean/Vegetable-based,3100,3110
+Mixed Dishes,Grain-based,3200,3210
+Mixed Dishes,Asian,3400,3410
+Mixed Dishes,Mexican,3500,3510
+Mixed Dishes,Pizza,3602,3602
+Mixed Dishes,Sandwiches,3700,3750
+Mixed Dishes,Soups,3800,3810
+Grains,Cooked Grains,4000,4005
+Grains,"Breads, Rolls, Tortillas",4200,4210
+Grains,Quick Breads and Bread Products,4400,4405
+Grains,Ready-to-Eat Cereals,4600,4610
+Grains,Cooked Cereals,4800,4810
+Snacks and Sweets,Savory Snacks,5000,5010
+Snacks and Sweets,Crackers,5200,5210
+Snacks and Sweets,Snack/Meal bars,5400,5410
+Snacks and Sweets,Sweet Bakery Products,5500,5510
+Snacks and Sweets,Candy,5700,5710
+Snacks and Sweets,Other Desserts,5800,5810
+Fruit,Apples,6002,6002
+Fruit,Bananas,6004,6004
+Fruit,Grapes,6006,6006
+Fruit,Peaches and nectarines,6008,6008
+Fruit,Strawberries,6009,6009
+Fruit,Blueberries and other berries,6011,6011
+Fruit,Citrus fruits,6012,6012
+Fruit,Melons,6014,6014
+Fruit,Dried fruits,6016,6016
+Fruit,Other fruits and fruit salads,6018,6018
+Fruit,Pears,6020,6020
+Fruit,Pineapple,6022,6022
+Fruit,Mango and papaya,6024,6024
+Vegetables,"Vegetables, excluding Potatoes",6400,6499
+Vegetables,White Potatoes,6800,6810
+Beverages,100% Juice,7000,7010
+Beverages,Diet Beverages,7100,7110
+Beverages,Sweetened Beverages,7200,7230
+Beverages,Coffee and Tea,7300,7310
+Alcoholic Beverages,Beer,7502,7502
+Alcoholic Beverages,Wine,7504,7504
+Alcoholic Beverages,Liquor and cocktails,7506,7506
+Water,Plain Water,7700,7710
+Water,Flavored or Enhanced Water,7800,7810
+Fats and Oils,Butter and animal fats,8002,8002
+Fats and Oils,Margarine,8004,8004
+Fats and Oils,"Cream cheese, sour cream, whipped cream",8006,8006
+Fats and Oils,Cream and cream substitutes,8008,8008
+Fats and Oils,Mayonnaise,8010,8010
+Fats and Oils,Salad dressings and vegetable oils,8012,8012
+Condiments and Sauces,Tomato-based condiments,8402,8402
+Condiments and Sauces,Soy-based condiments,8404,8404
+Condiments and Sauces,Mustard and other condiments,8406,8406
+Condiments and Sauces,"Olives, pickles, pickled vegetables",8408,8408
+Condiments and Sauces,"Pasta sauces, tomato-based",8410,8410
+Condiments and Sauces,"Dips, gravies, other sauces",8412,8412
+Sugars,Sugars and honey,8802,8802
+Sugars,Sugar substitutes,8804,8804
+Sugars,"Jams, syrups, toppings",8806,8806
+Baby Foods and Formulas,Baby Foods,9000,9020
+Baby Foods and Formulas,Baby Beverages,9200,9210
+Baby Foods and Formulas,Infant Formulas,9400,9410
+Baby Foods and Formulas,Human milk,9602,9602
+Other,Protein and nutritional powders,9802,9802
+Other,Not included in a food category,9999,9999

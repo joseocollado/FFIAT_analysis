@@ -1,0 +1,759 @@
+---
+title: "FNDDS to CTO Flow"
+author: "Jose Collado"
+date: "2026-07-10"
+output: html_document
+---
+### Inital Set up
+
+```{r setup, include=FALSE}
+#honestly i forget what this is for but it makes me feel safe when coding
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r color palettes, echo=FALSE}
+#not sure if we'll make any figures but this helps keep color choices accessible
+safe_colorblind_palette <- c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499", 
+                             "#44AA99", "#999933", "#882255", "#661100", "#6699CC", "#888888")
+```
+
+```{r directory set up, include=FALSE}
+# where my files live on my computer. Replace with your directory
+setwd("C:/Users/josecoll/Downloads/2026.07.10 FNDDS Files")
+
+# to confirm above change
+getwd()
+```
+
+## Survey CTO Searchable File
+
+Loading and combining the files from the FNDDS 21-23 documentation page.  
+```{r load and clean csv datasets, message=FALSE, warning=FALSE}
+library(tidyverse) # general frame work
+library(gcplyr) # for read_wides
+library(dplyr) # inner_join, piping
+
+# The FNDDS 21-23 file with additional description information
+FNDDS_addidesc <- read_wides(files = "FNDDS_addi_desc_raw.csv")
+
+# The FNDDS 21-23 file with base ingredient description
+FNDDS_ingre <- read_wides(files = "FNDDS_Ingredients_raw.csv")
+
+# let's merge description files by shared columns. Using full_join retains all rows and inserts NA where data is missing from either file. 'by' let's me specify which columns in the df are the same to lead the join process.
+FNDDS_desc_merged <- full_join(FNDDS_addidesc, FNDDS_ingre, by = c("Food_code","Main_food_description", "WWEIA_Category_number","WWEIA_Category_description"))
+
+# Following was to see what the additional row is from. 
+
+#FNDDS_desc_merged %>%
+  #group_by(WWEIA_Category_number) %>%
+  #count(WWEIA_Category_description)
+
+#FNDDS_ingre %>%
+  #group_by(WWEIA_Category_number) %>%
+  #count(WWEIA_Category_description)
+
+# After reviewing categories, Human milk was not in the FNDDS ingredients file.
+
+# now remove unnecessary columns (the last three might be important but I would not know atm)
+FNDDS_desc_merged$file.x <- NULL
+FNDDS_desc_merged$file.y <- NULL
+FNDDS_desc_merged$Ingredient_weight_gram <- NULL
+FNDDS_desc_merged$Retention_code <- NULL
+FNDDS_desc_merged$Moisture_change_percentage <- NULL
+
+# change column types as needed
+FNDDS_desc_merged <- FNDDS_desc_merged %>% mutate(across(c(Food_code, WWEIA_Category_number, Seq_num, Ingredient_code), as.numeric))
+
+# check updated column types
+str(FNDDS_desc_merged)
+
+# clear unneeded df from global environment
+rm(FNDDS_addidesc)
+rm(FNDDS_ingre)
+```
+
+### Adding WWEIA Categories
+
+Category 1 - Highest level grouping (i.e Milk and Dairy, Protein).
+```{r add WWEIA highest level categories}
+library(tidyverse) # general frame work
+library(gcplyr) # 
+library(dplyr) # for coalesce, piping
+
+# load WWEIA category 1 code ranges. Values from FNDDS documentation
+WWEIA_category_1_ranges <- read_wides(files = "WWEIA_Category_1_ranges.csv")
+
+# df to hold WWEIA values by row from main df in the loop 
+category_holder <- cbind(FNDDS_desc_merged["WWEIA_Category_number"])
+
+# empty column to place values from the for loop
+category_holder <- category_holder %>% 
+  mutate(WWEIA_Category_1 = NA, .after = 1)
+
+# blank df to fill pulled values in the loop
+FNDDS_Merged <- data.frame() 
+
+# loop with subsetting method. (previously did not subset and process took way longer)
+for (i in 1:nrow(WWEIA_category_1_ranges)) {
+  # load category into variable 
+  current_group <- WWEIA_category_1_ranges$Category_1[i]
+  
+  # second df to hold info. Filters category_holder by WWEIA ranges before adding second column with pasted category name
+  FNDDS_holder_2 <- category_holder %>% 
+    filter(WWEIA_Category_number >= WWEIA_category_1_ranges$C1_min[i], 
+           WWEIA_category_1_ranges$C1_max[i] >= WWEIA_Category_number) %>%
+    mutate(WWEIA_Category_1 = paste0(WWEIA_category_1_ranges$Category_1[i]))
+  
+  # add values from above into this merged file
+  FNDDS_Merged <- bind_rows(FNDDS_Merged,FNDDS_holder_2)
+}
+
+# add NA column to fill in specific location
+FNDDS_desc_merged <- FNDDS_desc_merged %>% 
+  mutate(WWEIA_Category_1 = NA, .after = 4)
+
+# replace NA values with newly labeled values
+FNDDS_desc_merged$WWEIA_Category_1 <- FNDDS_Merged$WWEIA_Category_1
+
+# clear unneeded df / variables
+rm(category_holder)
+rm(FNDDS_Merged)
+rm(WWEIA_category_1_ranges)
+rm(FNDDS_holder_2)
+```
+
+Category 2 - Next level grouping (i.e Milk and Dairy > Milk, Flavored Milk, Yogurt).
+```{r add WWEIA category 2}
+library(tidyverse) # general frame work
+library(gcplyr) # 
+library(dplyr) # for coalesce
+
+# load WWEIA category 2 code ranges
+WWEIA_category_2_ranges <- read_wides(files = "WWEIA_Category_2_ranges.csv")
+
+# holder df to label later
+category_holder <- cbind(FNDDS_desc_merged["WWEIA_Category_number"])
+category_holder <- category_holder %>% 
+  mutate(WWEIA_Category_2 = NA, .after = 1)
+
+#blank df to fill later
+FNDDS_Merged <- data.frame() 
+
+for (i in 1:nrow(WWEIA_category_2_ranges)) {
+  # load category into variable and print 
+  current_group <- WWEIA_category_2_ranges$Category_1[i]
+  current_subgroup <- WWEIA_category_2_ranges$Category_2[i]
+  
+  # second df to hold info. Filters category_holder by WWEIA ranges before adding second column with 
+  # pasted category name
+  FNDDS_holder_2 <- category_holder %>% filter(WWEIA_Category_number >= WWEIA_category_2_ranges$C2_min[i], WWEIA_category_2_ranges$C2_max[i] >= WWEIA_Category_number) %>%
+    mutate(WWEIA_Category_2 = paste0(WWEIA_category_2_ranges$Category_2[i]))
+  
+  # add values from above into this merged file
+  FNDDS_Merged <- bind_rows(FNDDS_Merged,FNDDS_holder_2)
+}
+
+# add NA column to fill in specified location
+FNDDS_desc_merged <- FNDDS_desc_merged %>% 
+  mutate(WWEIA_Category_2 = NA, .after = 5)
+
+# replace NA values with newly labeled values
+FNDDS_desc_merged$WWEIA_Category_2 <- FNDDS_Merged$WWEIA_Category_2
+
+# clear unneeded df / variables
+rm(category_holder)
+rm(FNDDS_Merged)
+rm(WWEIA_category_2_ranges)
+rm(FNDDS_holder_2)
+```
+
+
+```{r reorganize main dataframe}
+library(dplyr) # piping format
+
+# reorganizing the df to make sense to me and hopefully be more readable
+FNDDS_desc_merged <- FNDDS_desc_merged %>% relocate(Main_food_description, .after = WWEIA_Category_description) %>%
+  relocate(Additional_food_description, .after = Main_food_description) %>%
+  relocate(Food_code, .after = Seq_num)
+
+# renaming columns as needed 
+FNDDS_desc_merged <- FNDDS_desc_merged %>%
+  rename(WWEIA_Category_3 = WWEIA_Category_description)
+```
+
+### Adding Survey CTO readable codes
+
+Giving each value a unique numeric value allows Survey CTO to function as intented (I learned this the hard way). After same tinkering, I made it work for each category. At this level, I have also decide to add Condiment and Mixed Dish status markers. Since all of the values are at the category 1 level it made sense for me to do it here.
+
+Category 1 Labeling
+```{r Add CTO Category 1 values + Condiment & Mixed Dish}
+library(tidyverse) # general
+library(dplyr) # piping format
+
+# Table with selection groupings and values in a Survey CTO Readable format
+Item_values <- read_wides(files = "SurveyCTO_Item_codes.csv")
+
+# create df with only category 1 values
+category_level_values <- Item_values %>%
+  filter(Grouping == "Category 1")
+
+# get the number of categories for level 1
+row_count <- Item_values %>%
+  filter(Grouping == "Category 1") %>%
+  nrow()
+
+# holder df to label later with a blank column to add to
+Group_value_holder <- cbind(FNDDS_desc_merged["WWEIA_Category_1"])
+Group_value_holder <- Group_value_holder %>% 
+  mutate(WWEIA_Category_1_code = NA, .after = 1)
+
+# blank data frame to use in the for loop
+Item_codes_Merged <- data.frame() 
+
+# loop to go through each level group and add the survey CTO code value
+for (i in 1:row_count) {
+  # load category into variable
+  current_group <- category_level_values$Category[i]
+  
+  # load category CTO code into variable
+  group_code <- category_level_values$Category_key[i]
+  
+  # load condiment status into variable
+  condiment_status <- category_level_values$Condiment_status[i]
+  
+  # load mix dish status into variable
+  mixdish_status <- category_level_values$Mixdish_status[i]
+  
+  # second df to hold info. Filters Group_value_holder by WWEIA category before adding columns with pasted CTO code value and condiment status 
+  Group_value_holder_2 <- Group_value_holder %>% filter(WWEIA_Category_1 == current_group) %>%
+    mutate(CTO_code_1 = group_code) %>%
+    mutate(Condiment_status = condiment_status) %>%
+    mutate(Mixdish_status = mixdish_status) %>%
+    select(c(CTO_code_1, Condiment_status, Mixdish_status))
+  
+  # adds newly saved CTO values to passed df
+  Item_codes_Merged <- bind_rows(Item_codes_Merged,Group_value_holder_2)
+  
+  # prints current group and total row count of passed df
+  print(paste0(current_group,":",count(Item_codes_Merged)))
+}
+
+# add NA column to fill in specific location
+FNDDS_desc_merged <- FNDDS_desc_merged %>% 
+  mutate(Category_1_code = NA, .after = 2) %>%
+  mutate(Condiment_status = NA, .after = 7) %>%
+  mutate(Mixdish_status = NA, .after = 8)
+
+# replace NA values with newly labeled values
+FNDDS_desc_merged$Category_1_code <- Item_codes_Merged$CTO_code_1
+FNDDS_desc_merged$Condiment_status <- Item_codes_Merged$Condiment_status
+FNDDS_desc_merged$Mixdish_status <- Item_codes_Merged$Mixdish_status
+
+# double check values lined up
+FNDDS_desc_merged %>%
+  group_by(Category_1_code) %>%
+  count(WWEIA_Category_1)
+
+# clean up environment
+rm(condiment_status)
+rm(mixdish_status)
+```
+
+Category 2 Labeling
+```{r Add CTO Category 2 values}
+
+# create df with only category 2 values
+category_level_values <- Item_values %>%
+  filter(Grouping == "Category 2")
+
+# get the number of categories for level 2
+row_count <- Item_values %>%
+  filter(Grouping == "Category 2") %>%
+  nrow()
+
+# holder df to label later
+Group_value_holder <- cbind(FNDDS_desc_merged["WWEIA_Category_2"])
+Group_value_holder <- Group_value_holder %>% 
+  mutate(WWEIA_Category_2_code = NA, .after = 1)
+
+# blank data frame to add to
+Item_codes_Merged <- data.frame() 
+
+for (i in 1:row_count) {
+  # load category into variable
+  current_group <- category_level_values$Category[i]
+  
+  # load category CTO code into variable
+  group_code <- category_level_values$Category_key[i]
+  
+  # second df to hold info. Filters Group_value_holder by WWEIA category before adding second column with pasted CTO code value
+  Group_value_holder_2 <- Group_value_holder %>% filter(WWEIA_Category_2 == current_group) %>%
+    mutate(CTO_code_2 = group_code) %>%
+    select(CTO_code_2)
+  
+  # adds newly saved CTO values to passed df
+  Item_codes_Merged <- bind_rows(Item_codes_Merged,Group_value_holder_2)
+  
+  # prints current group and total row count of passed df to check
+  #print(paste0(current_group,":",count(Item_codes_Merged)))
+}
+
+# add NA column to fill in specific location
+FNDDS_desc_merged <- FNDDS_desc_merged %>% 
+  mutate(Category_2_code = NA, .after = 4)
+
+# replace NA values with newly labeled values
+FNDDS_desc_merged$Category_2_code <- Item_codes_Merged$CTO_code_2
+
+# double check values lined up
+FNDDS_desc_merged %>%
+  group_by(Category_2_code) %>%
+  count(WWEIA_Category_2)
+```
+
+Category 3 and 4 were already in the FNDDS files as WWEIA_Category_description and Main_food_description. But at these levels, it gets trickier as some groups category 2 and 3 are the same (i.e Cheese). After some tinkering, this was the solution I came up with.
+```{r Add CTO Category 3 values}
+# Goal: check if the WWEI cat 3 code is the same as the cat 2 code. 
+
+# make a df that has category 2 and 3 values + a blank comparison column
+Group_value_holder <- cbind(FNDDS_desc_merged["WWEIA_Category_2"])
+Group_value_holder$WWEIA_Category_3 <- FNDDS_desc_merged$WWEIA_Category_3
+Group_value_holder$comparison <- NA
+
+
+# get number of rows in the comparison df
+row_count <- Group_value_holder %>%
+  nrow()
+
+# compare values of each row. If the same, row = 1, else row = 0
+for (i in 1:row_count){
+  if (Group_value_holder$WWEIA_Category_2[i] == Group_value_holder$WWEIA_Category_3[i]){
+    Group_value_holder$comparison[i] = 0
+  } else {
+    Group_value_holder$comparison[i] = 1
+  }
+}
+
+# create df with only category 3 values
+category_level_values <- Item_values %>%
+  filter(Grouping == "Category 3")
+
+# for each row that is matching (1), look at WWEIA_category_3 and save that as a variable. Use that variable to find the Survey CTO code value and paste the code into the comparison column. For non matching rows (0), move to the next line.
+
+for (i in 1:row_count){
+  if (Group_value_holder$comparison[i] == 1){
+    current_group <- Group_value_holder$WWEIA_Category_3[i]
+    
+    Group_value_holder$comparison[i] <- Item_values %>%
+      filter(Category == current_group) %>%
+      pull(Category_key)
+  } else {
+    next
+  }
+}
+
+# add NA column to fill
+FNDDS_desc_merged <- FNDDS_desc_merged %>% 
+  mutate(Category_3_code = Group_value_holder$comparison, .after = 6)
+
+# replace NA values with newly labeled values
+FNDDS_desc_merged$Category_3_code <- Group_value_holder$comparison
+
+# double check values lined up
+FNDDS_desc_merged %>%
+  group_by(Category_3_code) %>%
+  count(WWEIA_Category_3)
+
+# clear the global environment
+rm(category_level_values)
+rm(Group_value_holder)
+rm(Group_value_holder_2)
+rm(Item_codes_Merged)
+rm(current_group)
+rm(current_subgroup)
+rm(i)
+rm(row_count)
+rm(group_code)
+```
+
+26.06.16 After months of sidetracks and other tasks that got in the way, I am finally tackling adding the fermentation status variable to add to the master csv file. I will have to reorg this sheet at some point but oh well.
+
+Point of this block is to 1) get high confidence ffbin1 for each unique fndds code and 2) get highest ferm value for each unique fndds code.
+
+```{r Add fermentation status}
+library(tidyverse) # general frame work
+library(gcplyr) # for read_wides
+library(dplyr) # inner_join, piping
+
+# The FNDDS 21-23 file with additional description information
+FNDDS_ferm_zpg <- read_wides(files = "fndds23ingfflm_raw.csv")
+
+# check column types
+str(FNDDS_ferm_zpg)
+
+# Keep a df with all unique FNDDS codes with FFbin1 (high confidence)
+FNDDS_ferm_bin1 <- FNDDS_ferm_zpg %>% 
+  group_by(wweaicatnumfood, wweaicatdescfood, parentfooddesc,ffbin1, parentfoodcode) %>%
+  distinct(parentfoodcode, ffbin1, .keep_all = TRUE)
+
+# Trying to make a data frame that keeps the highest value of ferming will be more complicated sadly but I will try
+
+# change ferming column to numeric for comparison purposes
+FNDDS_ferm_ingcode <- FNDDS_ferm_zpg %>%
+  mutate(ingfermscore = as.numeric(ingfermscore)) %>%
+  distinct(parentfoodcode, ingfermscore, .keep_all = FALSE)
+
+# count all the unique fndds codes
+row_count <- FNDDS_ferm_bin1 %>%
+  nrow()
+
+# save a 0 comparison variable for the nested loop
+temp <- 0 
+
+#df to append all the values to.
+FNDDS_ferm_ingcode_merged <- data.frame(parentfoodcode=character(),
+                                        merged_ferming=numeric())
+
+# create a loop to 1) subset df by fndds code, 2) compare ferming code and keep highest value, and 3) append saved fndds and ferming code to new df 
+
+for (i in 1:row_count){
+  #store the fndds code
+  fndds_code <- FNDDS_ferm_bin1$parentfoodcode[i]
+  
+  # filter df down to the specific fndds code
+  fndds_info <- FNDDS_ferm_ingcode %>%
+    filter(parentfoodcode == fndds_code)
+  
+  # count number of fndds rows in saved df
+  fndds_entries <- fndds_info %>%
+    nrow()
+  
+  # if fndds temp df has more than one row, do the comparison. Else move on
+  if (fndds_entries != 1) {
+      
+      for (j in 1:fndds_entries){
+        
+        # if temp variable is less than ferming code at row j
+        if(temp < fndds_info$ingfermscore[j]){
+          
+          # overwrite temp with new ferming
+          temp <- fndds_info$ingfermscore[j]
+          
+          # else, move on to next loop
+          } else {
+            next 
+          }
+      }
+   # else, do nothing BUT finish loop code
+  } else {
+     
+  }
+  
+  # save ferming and fnnds value to df
+  temp_ferming <- data.frame(parentfoodcode=fndds_code,
+                           merged_ferming=temp)
+  
+  # reset temp 
+  temp <- 0
+
+  # append i and j values to blank data frame
+  FNDDS_ferm_ingcode_merged <- bind_rows(FNDDS_ferm_ingcode_merged ,temp_ferming)
+}
+
+# merge ffbin1 and ferm ing info to one df
+FNDDS_ferm_info <- inner_join(FNDDS_ferm_ingcode_merged, FNDDS_ferm_bin1[, c("ffbin1", "ffcont1", "ffbin9","ffcont9", "lmcat", "parentfoodcode")], by = "parentfoodcode")
+
+# clean up environment 
+rm(FNDDS_ferm_bin1)
+rm(FNDDS_ferm_ingcode)
+rm(FNDDS_ferm_ingcode_merged)
+rm(FNDDS_ferm_zpg)
+rm(fndds_info)
+rm(temp_ferming)
+rm(fndds_code)
+rm(fndds_entries)
+rm(i)
+rm(j)
+rm(row_count)
+rm(temp)
+```
+
+```{r Subset Ingredients and Master FNDDS files}
+library(stringmagic) # for paste with operation chaining 
+
+# this version retains the Seq_Num and Ingredient_code and Ingredient_description columns for the different formulations of items with the same FNDDS code.
+
+# adjust df and subset columns to just the ingredient relevant ones
+FNDDS_ingredients <- FNDDS_desc_merged %>% 
+  ungroup() %>%
+  rename(Food_code_key = Food_code) %>%
+  select(Food_code_key, Ingredient_description, Ingredient_code, Seq_num) %>%
+  arrange(Food_code_key, Seq_num) %>%
+  mutate(Ingredient_key = row_number(), .after = 0) %>%
+  mutate(cto_key = Seq_num + (Food_code_key*100), .after = 4)
+
+# merge rows with the same FNDDS codes and remove unnecessary seq-num column
+FNDDS_collapsed <- FNDDS_desc_merged %>% 
+  group_by(WWEIA_Category_number, WWEIA_Category_1, Category_1_code, WWEIA_Category_2, 
+           Category_2_code, WWEIA_Category_3, Category_3_code, Main_food_description, Additional_food_description,
+           Condiment_status, Mixdish_status,Food_code) %>%
+  summarise(Seq_num = 
+              paste(na.omit(Seq_num), collapse = "***")) %>%
+  mutate(cto_search = paste(Main_food_description, Additional_food_description, sep = " ||| ")) %>%
+  mutate(Seq_num = NULL)
+
+# number all the rows in main df and rename
+FNDDS_collapsed <- FNDDS_collapsed %>%
+  ungroup() %>%
+  rename(Food_code_key = Food_code)
+
+# manipulate df columns as needed
+FNDDS_ferm_info <- FNDDS_ferm_info %>%
+  rename(Food_code_key = parentfoodcode) %>%
+  mutate(Food_code_key = as.numeric(Food_code_key))
+
+# add the ferm information from ZPG's analysis to the dataset
+FNDDS_collapsed <- inner_join (FNDDS_collapsed, FNDDS_ferm_info, by = "Food_code_key")
+```
+
+After finishing the fuzzy search compatible file, the next step is to do the same for the portion sizes linked to FNDDS codes
+```{r Subset Portions file}
+library(snakecase) # adjust column names
+ 
+# The FNDDS 21-23 file portion options and information for each FNDDS code
+FNDDS_portions <- read_wides(files = "FNDDS_portions_raw.csv")
+
+# rename and remove columns 
+FNDDS_portions$file <- NULL
+
+colnames(FNDDS_portions) <- to_snake_case(colnames(FNDDS_portions))
+
+# manipulating columns as needed 
+FNDDS_portions <- FNDDS_portions %>%
+  rename(food_code_key = food_code) %>%
+  mutate(portion_key = row_number(), .after = 5)
+```
+
+```{r checking labels alignment}
+
+# count Mixdish 1s by category
+FNDDS_collapsed %>%
+  group_by(WWEIA_Category_1) %>%
+  count(Mixdish_status)
+
+# count Condi 1s by category
+FNDDS_collapsed %>%
+  group_by(WWEIA_Category_1) %>%
+  count(Condiment_status)
+```
+
+My previous method for adding inulin status 1 or 0 ended up with a misaligned df and caused duplicate rows to pop up (5438 instead of 5432). Because I want to move onto CTO coding, I've decided to add inulin status after everything has been condensed by FNDDS code to hopefully prevent that issue. It would probably be worthwhile to fix my original method at some point (possible just for practice at that point).
+
+```{r Adding inulin status by category }
+#pull out categories that will be labeled 1 for inulin
+inulin_values <- Item_values %>%
+  filter(Inulin_status == 1)
+
+#count total categories
+wweia_amount <- Item_values %>%
+  nrow()
+
+# count inulin categories
+inulin_amount <- inulin_values %>%
+  nrow()
+
+# blank df to copy later
+inulin_holder <- data.frame()
+
+# The following code is repeated for all the wweia categories. For the number of whole categories that need the inulin label 1) save the CTO value for the category and for each wweia category 2) check if they are the same or not. If equal, filter the FNDDS codes to that category, change the inulin status to 1, and add those rows to a holder df. If they are not equal, move on to the next category.
+
+# Category 1 codes
+for(i in 1:inulin_amount) {
+  wweia_cat <- inulin_values$Category_key[i]
+  
+  for(j in 1:wweia_amount){
+    
+    if(j == wweia_cat) {
+      category_holder <- FNDDS_collapsed %>%
+        filter(Category_1_code == wweia_cat) %>%
+        mutate(Inulin_status = '1') %>%
+        select(Food_code_key, Category_1_code, Inulin_status)
+      
+      inulin_holder <- bind_rows(inulin_holder, category_holder)
+    } else {
+      next
+    }
+  }
+}
+
+# Category 2 code
+
+for(i in 1:inulin_amount) {
+  wweia_cat <- inulin_values$Category_key[i]
+  
+  for(j in 1:wweia_amount){
+    
+    if(j == wweia_cat) {
+      category_holder <- FNDDS_collapsed %>%
+        filter(Category_2_code == wweia_cat) %>%
+        mutate(Inulin_status = '1') %>%
+        select(Food_code_key, Category_1_code, Inulin_status)
+      
+      inulin_holder <- bind_rows(inulin_holder, category_holder)
+    } else {
+      next
+    }
+  }
+}
+
+# Category 3 code
+
+for(i in 1:inulin_amount) {
+  wweia_cat <- inulin_values$Category_key[i]
+  
+  for(j in 1:wweia_amount){
+    
+    if(j == wweia_cat) {
+      category_holder <- FNDDS_collapsed %>%
+        filter(Category_3_code == wweia_cat) %>%
+        mutate(Inulin_status = '1') %>%
+        select(Food_code_key, Category_1_code, Inulin_status)
+      
+      inulin_holder <- bind_rows(inulin_holder, category_holder)
+    } else {
+      next
+    }
+  }
+}
+
+# Manual Codes: after doing a manual check, here are additional codes that should be flagged. JOC has a separate word file that contains more information about why each code was flagged.
+
+inulin_manual <- c(72116000, 92202010, 92152000, 95312400, 95313200, 93102000, 12220200, 12220270, 12220280, 32103045, 32103035, 32103015, 32103025, 27446255, 27446245, 27446225, 27446235, 27450067, 27450065, 27450061, 27450063, 58148115, 58148117, 58148111, 58148113, 71601045, 71601035, 71601015, 71601025, 71603045, 71603035 ,71603015, 71603025, 92309030, 92309020, 92309510, 92305110, 92305090, 92305920, 83204000, 83204050, 83201000, 83203000, 83202020, 83204500, 83205450, 83200100, 83206500, 83207000, 91301081, 91301510, 11830165)
+
+for(i in inulin_manual) {
+  category_holder <- FNDDS_collapsed %>%
+    filter(Food_code_key == i) %>%
+    mutate(Inulin_status = '1') %>%
+    select(Food_code_key, Category_1_code, Inulin_status)
+      
+    inulin_holder <- bind_rows(inulin_holder, category_holder)
+}
+
+# collapse duplicate fndds codes
+inulin_collapsed <- inulin_holder %>%
+  mutate(Inulin_status = as.numeric(Inulin_status)) %>%
+  group_by(Food_code_key) %>%
+  summarise(Inulin_status = mean(Inulin_status))
+
+FNDDS_collapsed <- merge(FNDDS_collapsed, inulin_collapsed, by = "Food_code_key", all.x = TRUE)
+
+FNDDS_collapsed$Inulin_status[is.na(FNDDS_collapsed$Inulin_status)] <- 0
+
+FNDDS_collapsed <- FNDDS_collapsed %>%
+  relocate(Inulin_status, .after = Mixdish_status)
+
+#clear environment
+rm(category_holder)
+rm(inulin_collapsed)
+rm(inulin_holder)
+rm(inulin_values)
+rm(i)
+rm(j)
+rm(inulin_amount)
+rm(inulin_manual)
+rm(wweia_amount)
+rm(wweia_cat)
+```
+
+
+26.08.05 Some preliminary tested showed I needed to add additional WWEIA labels into mixed dish type for CTO. They are all in cat 3, so I need separate code to make it work.
+
+```{r Category 3 Mix Dish Status}
+library(tidyverse) # general
+library(dplyr) # piping format
+
+# create df with only category 3 values
+category_level_values <- Item_values %>%
+  filter(Grouping == "Category 3")
+
+Group_value_holder <- FNDDS_desc_merged[,c('Category_3_code','Food_code')]
+
+# get the number of categories for level 3
+row_count <- Item_values %>%
+  filter(Grouping == "Category 3") %>%
+  nrow()
+
+# blank data frame to use in the for loop
+Item_codes_Merged <- data.frame() 
+
+# loop to go through each level group and add the survey CTO code value
+for (i in 1:row_count) {
+  # load category into variable
+  current_group <- category_level_values$Category_key[i]
+  
+  # load mix dish status into variable
+  mixdish_status <- category_level_values$Mixdish_status[i]
+  
+  if(mixdish_status == 1){
+    # second df to hold info. Filters Group_value_holder by WWEIA category before adding columns with pasted CTO code value and condiment status 
+      Group_value_holder_2 <- Group_value_holder %>% filter(Category_3_code == current_group) %>%
+        mutate(Cat_3_mixdish = mixdish_status) %>%
+        select(c(Food_code, Cat_3_mixdish))
+      
+      # adds newly saved CTO values to passed df
+      Item_codes_Merged <- bind_rows(Item_codes_Merged,Group_value_holder_2)
+      
+      # prints current group and total row count of passed df
+      print(paste0(current_group,":",count(Item_codes_Merged)))
+  } else {
+    next
+  }
+  
+}
+
+# insert inulin values by FNDDS code
+FNDDS_collapsed <- merge(FNDDS_collapsed, unique(Item_codes_Merged), by.x = "Food_code_key",by.y = "Food_code", all.x = TRUE)
+
+# clear out 0's from mixdish column
+FNDDS_collapsed$Mixdish_status[FNDDS_collapsed$Mixdish_status == 0] <- NA
+
+# merge columns, replace NA with 0
+FNDDS_collapsed <- FNDDS_collapsed %>% 
+  mutate(Mixdish_status = coalesce(Mixdish_status,Cat_3_mixdish))
+
+FNDDS_collapsed$Mixdish_status[is.na(FNDDS_collapsed$Mixdish_status)] <- 0
+
+# remove unnecessary column
+FNDDS_collapsed$Cat_3_mixdish <- NULL
+
+# order df correctly
+FNDDS_collapsed <- FNDDS_collapsed %>% 
+  arrange(WWEIA_Category_number)
+
+# clean up environment
+rm(category_level_values)
+rm(Group_value_holder)
+rm(Group_value_holder_2)
+rm(Item_codes_Merged)
+rm(Item_values)
+rm(current_group)
+rm(mixdish_status)
+rm(i)
+rm(row_count)
+```
+
+### End Results 
+
+Final csv files for now.
+
+```{r Searchable FNDDS codes for CTO}
+# save collapsed df csv 
+write.csv(FNDDS_collapsed,"C:/Users/josecoll/Downloads/2026.07.10 FNDDS Files/fndds23_master_JOC.csv", row.names = FALSE)
+
+# save ingredients as a csv 
+write.csv(FNDDS_ingredients,"C:/Users/josecoll/Downloads/2026.07.10 FNDDS Files/fndds23_ingredients_JOC.csv", row.names = FALSE)
+
+# save edited df as csv for survey CTO 
+write.csv(FNDDS_portions,"C:/Users/josecoll/Downloads/2026.07.10 FNDDS Files/fndds23_portions_JOC.csv", row.names = FALSE)
+
+```

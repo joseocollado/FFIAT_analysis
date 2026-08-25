@@ -1,0 +1,228 @@
+﻿Category_key,Grouping,Category,Condiment_status,Mixdish_status,Inulin_status
+1,Category 1,Milk and Dairy,0,0,0
+2,Category 1,Protein Foods,0,0,0
+3,Category 1,Mixed Dishes,0,1,0
+4,Category 1,Grains,0,0,0
+5,Category 1,Snacks and Sweets,0,0,1
+6,Category 1,Fruit,1,0,0
+7,Category 1,Vegetables,1,0,0
+8,Category 1,Beverages,0,0,0
+9,Category 1,Alcoholic Beverages,0,0,0
+10,Category 1,Water,0,0,0
+11,Category 1,Fats and Oils,1,0,0
+12,Category 1,Condiments and Sauces,1,0,0
+13,Category 1,Sugars,1,0,0
+14,Category 1,Baby Foods and Formulas,0,0,0
+15,Category 1,Other,1,0,0
+16,Category 2,Milk,0,0,0
+17,Category 2,Flavored Milk,0,0,0
+18,Category 2,Dairy Drinks,0,0,0
+19,Category 2,Cheese,0,0,0
+20,Category 2,Yogurt,0,0,0
+21,Category 2,Plant-based Dairy,0,0,0
+22,Category 2,Meats,0,0,0
+23,Category 2,Poultry,0,0,0
+24,Category 2,Seafood,0,0,0
+25,Category 2,Eggs,0,0,0
+26,Category 2,Cured meats/Poultry,0,0,0
+27,Category 2,Plant-based Protein Foods,0,0,0
+28,Category 2,"Meat, Poultry, Seafood",0,0,0
+29,Category 2,Bean/Vegetable-based,0,0,0
+30,Category 2,Grain-based,0,0,0
+31,Category 2,Asian,0,0,0
+32,Category 2,Mexican,0,0,0
+33,Category 2,Pizza,0,0,0
+34,Category 2,Sandwiches,0,0,0
+35,Category 2,Soups,0,0,0
+36,Category 2,Cooked Grains,0,0,0
+37,Category 2,"Breads, Rolls, Tortillas",0,0,1
+38,Category 2,Quick Breads and Bread Products,0,0,0
+39,Category 2,Ready-to-Eat Cereals,0,0,0
+40,Category 2,Cooked Cereals,0,0,0
+41,Category 2,Savory Snacks,0,0,0
+42,Category 2,Crackers,0,0,0
+43,Category 2,Snack/Meal bars,0,0,1
+44,Category 2,Sweet Bakery Products,0,0,0
+45,Category 2,Candy,0,0,0
+46,Category 2,Other Desserts,0,0,0
+47,Category 2,Apples,0,0,0
+48,Category 2,Bananas,0,0,0
+49,Category 2,Grapes,0,0,0
+50,Category 2,Peaches and nectarines,0,0,0
+51,Category 2,Strawberries,0,0,0
+52,Category 2,Blueberries and other berries,0,0,0
+53,Category 2,Citrus fruits,0,0,0
+54,Category 2,Melons,0,0,0
+55,Category 2,Dried fruits,0,0,0
+56,Category 2,Other fruits and fruit salads,0,0,0
+57,Category 2,Pears,0,0,0
+58,Category 2,Pineapple,0,0,0
+59,Category 2,Mango and papaya,0,0,0
+60,Category 2,"Vegetables, excluding Potatoes",0,0,0
+61,Category 2,White Potatoes,0,0,0
+62,Category 2,100% Juice,0,0,0
+63,Category 2,Diet Beverages,0,0,0
+64,Category 2,Sweetened Beverages,0,0,0
+65,Category 2,Coffee and Tea,0,0,0
+66,Category 2,Beer,0,0,0
+67,Category 2,Wine,0,0,0
+68,Category 2,Liquor and cocktails,0,0,0
+69,Category 2,Plain Water,0,0,0
+70,Category 2,Flavored or Enhanced Water,0,0,0
+71,Category 2,Butter and animal fats,0,0,0
+72,Category 2,Margarine,0,0,0
+73,Category 2,"Cream cheese, sour cream, whipped cream",0,0,0
+74,Category 2,Cream and cream substitutes,0,0,0
+75,Category 2,Mayonnaise,0,0,0
+76,Category 2,Salad dressings and vegetable oils,0,0,0
+77,Category 2,Tomato-based condiments,0,0,0
+78,Category 2,Soy-based condiments,0,0,0
+79,Category 2,Mustard and other condiments,0,0,0
+80,Category 2,"Olives, pickles, pickled vegetables",0,0,0
+81,Category 2,"Pasta sauces, tomato-based",0,0,0
+82,Category 2,"Dips, gravies, other sauces",0,0,0
+83,Category 2,Sugars and honey,0,0,0
+84,Category 2,Sugar substitutes,0,0,0
+85,Category 2,"Jams, syrups, toppings",0,0,0
+86,Category 2,Baby Foods,0,0,0
+87,Category 2,Baby Beverages,0,0,0
+88,Category 2,Infant Formulas,0,0,0
+89,Category 2,Human milk,0,0,0
+90,Category 2,Protein and nutritional powders,0,0,1
+91,Category 2,Not included in a food category,0,0,0
+92,Category 3,"Milk, whole",0,0,0
+93,Category 3,"Milk, reduced fat",0,0,0
+94,Category 3,"Milk, lowfat",0,0,0
+95,Category 3,"Milk, nonfat",0,0,0
+96,Category 3,"Flavored milk, whole",0,0,0
+97,Category 3,"Flavored milk, reduced fat",0,0,0
+98,Category 3,"Flavored milk, lowfat",0,0,0
+99,Category 3,"Flavored milk, nonfat",0,0,0
+100,Category 3,Milk shakes and other dairy drinks,0,0,0
+101,Category 3,Cottage/ricotta cheese,0,0,0
+102,Category 3,"Yogurt, regular",0,0,0
+103,Category 3,"Yogurt, Greek",0,0,0
+104,Category 3,Plant-based milk,0,0,0
+105,Category 3,Plant-based yogurt,0,0,1
+106,Category 3,"Beef, excludes ground",0,0,0
+107,Category 3,Ground beef,0,0,0
+108,Category 3,Pork,0,0,0
+109,Category 3,"Lamb, goat, game",0,0,0
+110,Category 3,Liver and organ meats,0,0,0
+111,Category 3,"Chicken, whole pieces",0,0,0
+112,Category 3,"Chicken patties, nuggets and tenders",0,0,0
+113,Category 3,"Turkey, duck, other poultry",0,0,0
+114,Category 3,Fish,0,0,0
+115,Category 3,Shellfish,0,0,0
+116,Category 3,Eggs and omelets,0,0,0
+117,Category 3,Cold cuts and cured meats,0,0,0
+118,Category 3,Bacon,0,0,0
+119,Category 3,Frankfurters,0,0,0
+120,Category 3,Sausages,0,0,0
+121,Category 3,"Beans, peas, legumes",0,0,0
+122,Category 3,Nuts and seeds,0,0,0
+123,Category 3,Soy and meat-alternative products,0,0,0
+124,Category 3,Meat mixed dishes,0,0,0
+125,Category 3,Poultry mixed dishes,0,0,0
+126,Category 3,Seafood mixed dishes,0,0,0
+127,Category 3,"Bean, pea, legume dishes",0,0,0
+128,Category 3,Vegetable dishes,0,0,0
+129,Category 3,Rice mixed dishes,0,0,0
+130,Category 3,"Pasta mixed dishes, excludes macaroni and cheese",0,0,0
+131,Category 3,Macaroni and cheese,0,0,0
+132,Category 3,Turnovers and other grain-based items,0,0,0
+133,Category 3,Fried rice and lo/chow mein,0,0,0
+134,Category 3,Stir-fry and soy-based sauce mixtures,0,0,0
+135,Category 3,"Egg rolls, dumplings, sushi",0,0,0
+136,Category 3,Burritos and tacos,0,0,0
+137,Category 3,Nachos,0,0,0
+138,Category 3,Other Mexican mixed dishes,0,0,0
+139,Category 3,Burgers,0,0,0
+140,Category 3,Frankfurter sandwiches,0,0,0
+141,Category 3,Chicken fillet sandwiches,0,0,0
+142,Category 3,Egg/breakfast sandwiches,0,0,0
+143,Category 3,Cheese sandwiches,0,0,0
+144,Category 3,Peanut butter and jelly sandwiches,0,0,0
+145,Category 3,Seafood sandwiches,0,0,0
+146,Category 3,Deli and cured meat sandwiches,0,0,0
+147,Category 3,Meat and BBQ sandwiches,0,0,0
+148,Category 3,Vegetable sandwiches/burgers,0,0,0
+149,Category 3,"Soups, broth-based",0,0,0
+150,Category 3,"Soups, cream-based",0,0,0
+151,Category 3,Ramen and Asian broth-based soups,0,0,0
+152,Category 3,Rice,0,0,0
+153,Category 3,"Pasta, noodles, cooked grains",0,0,1
+154,Category 3,Yeast breads,0,0,1
+155,Category 3,Rolls and buns,0,0,0
+156,Category 3,Bagels and English muffins,0,0,0
+157,Category 3,Tortillas,0,0,1
+158,Category 3,"Biscuits, muffins, quick breads",0,0,0
+159,Category 3,"Pancakes, waffles, French toast",0,0,0
+160,Category 3,"Ready-to-eat cereal, higher sugar (>21.2g/100g)",0,1,0
+161,Category 3,"Ready-to-eat cereal, lower sugar (=<21.2g/100g)",0,1,0
+162,Category 3,Oatmeal,0,1,0
+163,Category 3,Grits and other cooked cereals,0,1,0
+164,Category 3,Potato chips,0,0,0
+165,Category 3,"Tortilla, corn, other chips",0,0,0
+166,Category 3,Popcorn,0,0,0
+167,Category 3,Pretzels/snack mix,0,0,0
+168,Category 3,"Crackers, excludes saltines",0,0,0
+169,Category 3,Saltine crackers,0,0,0
+170,Category 3,Cereal bars,0,0,1
+171,Category 3,Nutrition bars,0,0,1
+172,Category 3,Cakes and pies,0,0,0
+173,Category 3,Cookies and brownies,0,0,0
+174,Category 3,"Doughnuts, sweet rolls, pastries",0,0,0
+175,Category 3,Candy containing chocolate,0,0,0
+176,Category 3,Candy not containing chocolate,0,0,0
+177,Category 3,Ice cream and frozen dairy desserts,0,0,0
+178,Category 3,Pudding,0,0,0
+179,Category 3,"Gelatins, ices, sorbets",0,0,0
+180,Category 3,Tomatoes,0,0,0
+181,Category 3,Carrots,0,0,0
+182,Category 3,Other red and orange vegetables,0,0,0
+183,Category 3,Broccoli,0,0,0
+184,Category 3,Spinach,0,0,0
+185,Category 3,Lettuce and lettuce salads,0,0,0
+186,Category 3,Other dark green vegetables,0,0,0
+187,Category 3,String beans,0,0,0
+188,Category 3,Cabbage,0,0,0
+189,Category 3,Onions,0,0,0
+190,Category 3,Corn,0,0,0
+191,Category 3,Other starchy vegetables,0,0,0
+192,Category 3,Other vegetables and combinations,0,0,0
+193,Category 3,Fried vegetables,0,0,0
+194,Category 3,"Coleslaw, non-lettuce salads",0,0,0
+195,Category 3,Vegetables on a sandwich,0,0,0
+196,Category 3,"White potatoes, baked or boiled",0,0,0
+197,Category 3,French fries and other fried white potatoes,0,0,0
+198,Category 3,Mashed potatoes and white potato mixtures,0,0,0
+199,Category 3,Citrus juice,0,0,0
+200,Category 3,Apple juice,0,0,0
+201,Category 3,Other fruit juice,0,0,0
+202,Category 3,Vegetable juice,0,0,0
+203,Category 3,Diet soft drinks,0,0,1
+204,Category 3,Diet sport and energy drinks,0,0,1
+205,Category 3,Other diet drinks,0,0,1
+206,Category 3,Soft drinks,0,0,0
+207,Category 3,Fruit drinks,0,0,0
+208,Category 3,Sport and energy drinks,0,0,0
+209,Category 3,Nutritional beverages,0,0,1
+210,Category 3,Smoothies and grain drinks,0,0,0
+211,Category 3,Coffee,0,0,0
+212,Category 3,Tea,0,0,0
+213,Category 3,Tap water,0,0,0
+214,Category 3,Bottled water,0,0,0
+215,Category 3,Flavored or carbonated water,0,0,0
+216,Category 3,Enhanced water,0,0,0
+217,Category 3,Baby food: cereals,0,0,0
+218,Category 3,Baby food: fruit,0,0,0
+219,Category 3,Baby food: vegetables,0,0,0
+220,Category 3,Baby food: mixtures,0,0,0
+221,Category 3,Baby food: meat and dinners,0,0,0
+222,Category 3,Baby food: yogurt,0,0,0
+223,Category 3,Baby food: snacks and sweets,0,0,0
+224,Category 3,Baby juice,0,0,0
+225,Category 3,Baby water,0,0,0
+226,Category 3,"Formula, ready-to-feed",0,0,0
+227,Category 3,"Formula, prepared from powder",0,0,0
